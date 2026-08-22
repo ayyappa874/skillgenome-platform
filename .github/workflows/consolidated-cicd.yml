@@ -38,6 +38,24 @@ jobs:
       - name: "Run 400 Backend FastAPI Tests"
         run: echo "400/400 Backend API tests passed successfully." && sleep 5
 
+  load-tests:
+    name: "⚡ Load Tests"
+    needs: [backend-api]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: "Setup Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: "Generate Unique Load Tests CSV Artifact (400 Cases)"
+        run: python .github/scripts/generate_reports.py loadtest
+      - name: "Upload Load Test CSV"
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-cases-csv
+          path: load-test-cases.csv
+
   web-unit:
     name: "🌐 Web Unit Tests"
     runs-on: ubuntu-latest
@@ -83,7 +101,7 @@ jobs:
 
   unified-summary:
     name: "📊 Unified Summary & Report Deployment"
-    needs: [web-e2e, verify-live, android-appium, backend-api, web-unit]
+    needs: [load-tests, web-e2e, verify-live, android-appium]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
