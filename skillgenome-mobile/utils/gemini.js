@@ -13,11 +13,9 @@ const getLocalBackendUrl = () => {
 };
 
 const API_KEYS = {
-  // 🛑 ERROR FIXED: Previous keys started with "AQ.Ab..." which are Google OAuth Access Tokens, NOT Gemini API keys!
-  // Gemini API keys MUST start with "AIzaSy..."
-  RESUME: 'AIzaSyA7FnBEaQK9xopkeDq-RtjbXpVkBlHhtqg',
-  CHAT: 'AIzaSyA7FnBEaQK9xopkeDq-RtjbXpVkBlHhtqg',
-  AUDIO: 'AIzaSyA7FnBEaQK9xopkeDq-RtjbXpVkBlHhtqg'
+  RESUME: process.env.EXPO_PUBLIC_GEMINI_RESUME_KEY || '',
+  CHAT: process.env.EXPO_PUBLIC_GEMINI_CHAT_KEY || '',
+  AUDIO: process.env.EXPO_PUBLIC_GEMINI_AUDIO_KEY || ''
 };
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
