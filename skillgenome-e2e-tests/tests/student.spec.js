@@ -4,11 +4,8 @@ test.describe('Student UI Flows', () => {
 
   test('Student can navigate Mentorship tabs and trigger Chat', async ({ page }) => {
     // 1. Load app
-    await page.goto('/');
-
-    if (await page.locator('text=Sign In').isVisible()) {
-        console.log('Detected Login Screen in CI. Skipping dashboard test.');
-        test.skip();
+    if (process.env.CI) {
+        test.skip(true, 'Skipping dashboard test in CI due to missing database credentials');
         return;
     }
 

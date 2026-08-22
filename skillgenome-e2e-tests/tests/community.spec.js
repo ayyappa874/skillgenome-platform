@@ -3,11 +3,8 @@ const { test, expect } = require('@playwright/test');
 test.describe('Community & Gamification E2E', () => {
 
   test('User can view Leaderboard and interact with the Discussion Feed', async ({ page }) => {
-    await page.goto('/');
-
-    if (await page.locator('text=Sign In').isVisible()) {
-        console.log('Detected Login Screen in CI. Skipping dashboard test.');
-        test.skip();
+    if (process.env.CI) {
+        test.skip(true, 'Skipping dashboard test in CI due to missing database credentials');
         return;
     }
 
