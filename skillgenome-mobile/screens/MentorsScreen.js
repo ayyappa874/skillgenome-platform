@@ -5,7 +5,7 @@ import { t } from "../utils/translations";
 import { getTheme } from "../utils/theme";
 import { supabase } from "../utils/supabase";
 
-const MentorsScreen = ({ profile = {}, onBack, isDarkMode = true, language = 'English' }) => {
+const MentorsScreen = ({ profile = {}, onBack, onOpenChat, isDarkMode = true, language = 'English' }) => {
   
   const T = getTheme(isDarkMode);
   const S = React.useMemo(() => getStyles(T), [T]);
@@ -14,6 +14,7 @@ const MentorsScreen = ({ profile = {}, onBack, isDarkMode = true, language = 'En
 
   const [mentors, setMentors] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [activeTab, setActiveTab] = React.useState("Recommended");
 
   React.useEffect(() => {
     Animated.parallel([
@@ -62,9 +63,9 @@ const MentorsScreen = ({ profile = {}, onBack, isDarkMode = true, language = 'En
              }
           });
 
-          // If no skills are defined in DB yet, fake a high match score for the demo
+          // If no skills are defined in DB yet, fallback to base score (previously 92 for demo, now 30)
           if (!hasSkills) {
-             score = 92; 
+             score = 30; 
           }
 
           // Role matching
@@ -124,7 +125,11 @@ const MentorsScreen = ({ profile = {}, onBack, isDarkMode = true, language = 'En
           console.error(e);
         }
       } else if (status === 'accepted') {
-        Alert.alert("Chat", `Opening chat with ${m.name}...`);
+        if (onOpenChat) {
+          onOpenChat(m);
+        } else {
+          Alert.alert("Chat", `Opening chat with ${m.name}...`);
+        }
       }
     };
 
@@ -154,11 +159,12 @@ const MentorsScreen = ({ profile = {}, onBack, isDarkMode = true, language = 'En
           </View>
           <Pressable 
             onPress={handleConnect}
-            style={[
+            style={({ pressed }) => [
               S.actionBtn, 
               status === 'pending' && { backgroundColor: T.surface2, borderColor: T.border },
               status === 'none' && { backgroundColor: T.accent, borderColor: T.accent },
               status === 'accepted' && { backgroundColor: T.cyan, borderColor: T.cyan },
+              pressed && { opacity: 0.7, transform: [{ scale: 0.98 }] }
             ]}
           >
             <Text style={[S.actionText, status === 'pending' && { color: T.text }]}>
@@ -203,25 +209,52 @@ const MentorsScreen = ({ profile = {}, onBack, isDarkMode = true, language = 'En
           </View>
 
           <View style={S.filterRow}>
-            {["Recommended", "Top Rated", "My Mentors"].map((f, i) => (
-              <View key={f} style={[S.filterChip, i === 0 && { borderColor: T.purple, backgroundColor: `${T.purple}15` }]}>
-                <Text style={[S.filterText, i === 0 && { color: T.purple }]}>{f}</Text>
-              </View>
-            ))}
+            {["Recommended", "Top Rated", "My Mentors"].map((f) => {
+              const isActive = activeTab === f;
+              return (
+                <Pressable 
+                  key={f} 
+                  onPress={() => setActiveTab(f)}
+                  style={[S.filterChip, isActive && { borderColor: T.purple, backgroundColor: `${T.purple}15` }]}
+                >
+                  <Text style={[S.filterText, isActive && { color: T.purple }]}>{f}</Text>
+                </Pressable>
+              );
+            })}
           </View>
 
           <View style={[S.list, { marginTop: 24 }]}>
             {loading ? (
               <Text style={{ color: T.muted, textAlign: 'center', marginTop: 40 }}>Loading mentors...</Text>
-            ) : mentors.length === 0 ? (
-              <View style={{ alignItems: 'center', marginTop: 40 }}>
-                <Text style={{ fontSize: 40, marginBottom: 12 }}>🎓</Text>
-                <Text style={{ color: T.text, fontSize: 18, fontWeight: 'bold' }}>No mentors available</Text>
-                <Text style={{ color: T.muted, fontSize: 14, marginTop: 8, textAlign: 'center', paddingHorizontal: 20 }}>Check back later to connect with industry leaders.</Text>
-              </View>
-            ) : (
-              mentors.map(m => <MentorCard key={m.id} m={m} />)
-            )}
+            ) : (() => {
+              // Filter and sort based on active tab
+              let displayMentors = [...mentors];
+              if (activeTab === "My Mentors") {
+                displayMentors = displayMentors.filter(m => m.status === 'accepted' || m.status === 'pending');
+              } else if (activeTab === "Top Rated") {
+                displayMentors.sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating));
+              } else {
+                displayMentors.sort((a, b) => b.matchScore - a.matchScore);
+              }
+
+              if (displayMentors.length === 0) {
+                return (
+                  <View style={{ alignItems: 'center', marginTop: 40 }}>
+                    <Text style={{ fontSize: 40, marginBottom: 12 }}>🎓</Text>
+                    <Text style={{ color: T.text, fontSize: 18, fontWeight: 'bold' }}>
+                      {activeTab === "My Mentors" ? "No connected mentors yet" : "No mentors available"}
+                    </Text>
+                    <Text style={{ color: T.muted, fontSize: 14, marginTop: 8, textAlign: 'center', paddingHorizontal: 20 }}>
+                      {activeTab === "My Mentors" 
+                        ? "Check the Recommended tab to find your first mentor!" 
+                        : "Check back later to connect with industry leaders."}
+                    </Text>
+                  </View>
+                );
+              }
+
+              return displayMentors.map(m => <MentorCard key={m.id} m={m} />);
+            })()}
           </View>
         </Animated.View>
       </ScrollView>
@@ -251,9 +284,9 @@ const getStyles = (T) => StyleSheet.create({
   filterChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, borderWidth: 1, borderColor: T.borderLow, backgroundColor: T.surface },
   filterText: { fontSize: 13, color: T.muted, fontWeight: "600" },
 
-  list: { gap: 16 },
-  card: { padding: 20, borderRadius: 20, borderWidth: 1, gap: 14 },
-  matchBadge: { position: "absolute", top: 16, right: 16, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+  list: { gap: 20 },
+  card: { padding: 20, borderRadius: 24, borderWidth: 1, gap: 14, ...T.cardShadow },
+  matchBadge: { position: "absolute", top: 16, right: 16, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, ...T.cardShadow },
   matchText: { fontSize: 10, fontWeight: "800", color: "#fff" },
   cardTop: { flexDirection: "row", gap: 14 },
   avatar: { width: 56, height: 56, borderRadius: 16, alignItems: "center", justifyContent: "center" },

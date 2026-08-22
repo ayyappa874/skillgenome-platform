@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, useWindowDimensions, Dimensions, Alert } from 'react-native';
 import RadarChart from './RadarChart';
 
 const MentorStudentDetailModal = ({ student, onClose, onViewFullProfile, T }) => {
   const { width } = useWindowDimensions();
   const isWide = width >= 768;
   const [activeTab, setActiveTab] = useState('overview');
+  const [scheduled, setScheduled] = useState(false);
 
   if (!student) return null;
 
@@ -90,15 +91,26 @@ const MentorStudentDetailModal = ({ student, onClose, onViewFullProfile, T }) =>
         <Text style={{ color: T.green, fontWeight: '800' }}>Active</Text>
       </View>
 
-      <Pressable style={[S.actionBtn, { backgroundColor: T.accent }]}>
-        <Text style={{ color: '#fff', fontWeight: '700' }}>Schedule Check-in</Text>
+      <Pressable 
+        onPress={() => setScheduled(true)}
+        style={({ pressed }) => [
+          S.actionBtn, 
+          { backgroundColor: scheduled ? T.green : T.accent },
+          T.cardShadow,
+          pressed && !scheduled && { opacity: 0.8, transform: [{ scale: 0.98 }] }
+        ]}
+        disabled={scheduled}
+      >
+        <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16 }}>
+          {scheduled ? "Check-in Scheduled! ✓" : "Schedule Check-in"}
+        </Text>
       </Pressable>
     </View>
   );
 
   return (
     <View style={S.overlay}>
-      <View style={[S.modal, { backgroundColor: T.bg, borderColor: T.border, width: isWide ? '70%' : '95%', height: isWide ? '85%' : '90%' }]}>
+      <View style={[S.modal, { backgroundColor: T.bg, borderColor: T.border, width: isWide ? '70%' : '95%', height: isWide ? '85%' : '90%' }, T.cardShadow]}>
         
         {/* Header */}
         <View style={[S.header, { borderBottomColor: T.borderLow }]}>

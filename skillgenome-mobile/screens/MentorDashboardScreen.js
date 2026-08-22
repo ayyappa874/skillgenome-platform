@@ -431,7 +431,7 @@ export default function MentorDashboardScreen({ profile = { name: "Mentor", titl
   );
 
   return (
-    <View style={[S.root, { backgroundColor: T.bg }]}>
+    <View style={[S.root, { backgroundColor: 'transparent' }]}>
       {/* Background Glows */}
       <View pointerEvents="none" style={StyleSheet.absoluteFill}>
         <LinearGradient colors={[`${T.violet}15`, "transparent"]} style={{ position: 'absolute', top: -100, left: -50, width: 400, height: 400, borderRadius: 200 }} />
@@ -602,10 +602,10 @@ const getStyles = (T, isWide) => StyleSheet.create({
   profileName: { fontSize: 13, fontWeight: "700", color: T.text },
   profileRole: { fontSize: 11, color: T.muted },
 
-  mainLayout: { flex: 1, flexDirection: "row", maxWidth: 1400, width: "100%", alignSelf: "center" },
-  leftCol: { width: 240, borderRightWidth: 1, borderRightColor: T.borderLow, paddingVertical: 20 },
-  centerCol: { flex: 1, paddingHorizontal: 32, paddingVertical: 24 },
-  rightCol: { width: 320, padding: 24, borderLeftWidth: 1, borderLeftColor: T.borderLow },
+  mainLayout: { flex: 1, flexDirection: "row", width: "100%", paddingHorizontal: isWide ? 40 : 0 },
+  leftCol: { width: 280, borderRightWidth: 1, borderRightColor: T.borderLow, paddingVertical: 32 },
+  centerCol: { flex: 1, paddingHorizontal: isWide ? 40 : 32, paddingVertical: 24 },
+  rightCol: { width: 340, padding: 24, borderLeftWidth: 1, borderLeftColor: T.borderLow },
 
   mainLayoutMobile: { flex: 1, flexDirection: "column" },
   mobileCatNav: { flexGrow: 0, borderBottomWidth: 1, borderBottomColor: T.borderLow, paddingHorizontal: 16, paddingVertical: 12 },
@@ -627,17 +627,17 @@ const getStyles = (T, isWide) => StyleSheet.create({
   leftNav: { flex: 1, paddingHorizontal: 16 },
   navCat: { marginBottom: 6 },
   navCatActiveContainer: {},
-  navCatInner: { flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 16, paddingHorizontal: 20, borderRadius: 16 },
-  navCatGradient: { flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 16, paddingHorizontal: 20, borderRadius: 16 },
-  navIcon: { fontSize: 22 },
-  navCatLabel: { fontSize: 17, fontWeight: "600", color: T.muted },
+  navCatInner: { flexDirection: "row", alignItems: "center", gap: 16, paddingVertical: 18, paddingHorizontal: 24, borderRadius: 16 },
+  navCatGradient: { flexDirection: "row", alignItems: "center", gap: 16, paddingVertical: 18, paddingHorizontal: 24, borderRadius: 16 },
+  navIcon: { fontSize: 26 },
+  navCatLabel: { fontSize: 18, fontWeight: "600", color: T.muted },
   navCatLabelActive: { color: "#ffffff", fontWeight: "800" },
 
-  subTabsContainer: { marginLeft: 16, marginTop: 4, paddingLeft: 16, borderLeftWidth: 1, borderLeftColor: T.borderLow, gap: 4 },
-  subTab: { paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8 },
+  subTabsContainer: { marginLeft: 24, marginTop: 8, paddingLeft: 20, borderLeftWidth: 2, borderLeftColor: T.borderLow, gap: 6 },
+  subTab: { paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10 },
   subTabActive: { backgroundColor: `${T.accent}20` },
-  subTabLabel: { fontSize: 13, fontWeight: "600", color: T.muted },
-  subTabLabelActive: { color: T.accent, fontWeight: "700" },
+  subTabLabel: { fontSize: 15, fontWeight: "600", color: T.muted },
+  subTabLabelActive: { color: T.accent, fontWeight: "800" },
 
   centerContent: { flex: 1 },
   pageTitle: { fontSize: isWide ? 28 : 24, fontWeight: "900", color: T.text, letterSpacing: -0.5 },

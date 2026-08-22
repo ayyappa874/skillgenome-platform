@@ -814,6 +814,22 @@ const initialStudyMessages = [];
             .eq('id', session.user.id)
             .single();
 
+          if (profileData?.is_banned) {
+            await supabase.auth.signOut();
+            if (Platform.OS === 'web') alert("BANNED: Your account has been banned from the platform.");
+            else Alert.alert("BANNED", "Your account has been banned from the platform.");
+            setCurrentScreen(0);
+            return;
+          }
+
+          if (profileData?.role === 'mentor' && !profileData?.is_verified) {
+            await supabase.auth.signOut();
+            if (Platform.OS === 'web') alert("PENDING APPROVAL: Your mentor account is pending admin verification. You will be notified once approved.");
+            else Alert.alert("PENDING APPROVAL", "Your mentor account is pending admin verification. You will be notified once approved.");
+            setCurrentScreen(0);
+            return;
+          }
+
           const resolvedRole = profileData?.role || session.user.user_metadata?.user_type || 'student';
           const resolvedName = profileData?.name || session.user.user_metadata?.full_name || 'Ayyappa';
 
@@ -827,6 +843,7 @@ const initialStudyMessages = [];
             skills: profileData?.skills || [],
             role: resolvedRole,
             avatarUrl: profileData?.avatar_url || '',
+            verified: profileData?.is_verified || false
           });
 
           await syncUserData(session.user.id);

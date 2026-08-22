@@ -144,10 +144,11 @@ export default function AdminDashboardScreen({ profile, onBack, onOpenSettings, 
     }
     
     await supabase.from('notifications').insert({
-      user_id: banUserObj.id,
-      type: 'system_alert',
-      title: 'ACCOUNT BANNED',
-      message: `Your account has been banned. Duration: ${banDuration}. Reason: ${banReason || 'Violation of terms.'}`
+      recipient_id: banUserObj.id,
+      actor_id: profile?.id || '00000000-0000-0000-0000-000000000000',
+      actor_name: 'SkillGenome Admin',
+      notification_type: 'system_alert',
+      message: `ACCOUNT BANNED: Your account has been banned. Duration: ${banDuration}. Reason: ${banReason || 'Violation of terms.'}`
     });
 
     setBanUserObj(null);
@@ -162,10 +163,11 @@ export default function AdminDashboardScreen({ profile, onBack, onOpenSettings, 
       return;
     }
     await supabase.from('notifications').insert({
-      user_id: userId,
-      type: 'system_alert',
-      title: 'ACCOUNT RESTORED',
-      message: 'Your account ban has been lifted. Welcome back!'
+      recipient_id: userId,
+      actor_id: profile?.id || '00000000-0000-0000-0000-000000000000',
+      actor_name: 'SkillGenome Admin',
+      notification_type: 'system_alert',
+      message: 'ACCOUNT RESTORED: Your account ban has been lifted. Welcome back!'
     });
     fetchUsers();
     Alert.alert("Unbanned", "User has been unbanned successfully.");
@@ -194,12 +196,14 @@ export default function AdminDashboardScreen({ profile, onBack, onOpenSettings, 
     
     if (!current) {
       // They just got verified
-      await supabase.from('notifications').insert({
-        user_id: mentorId,
-        type: 'system_alert',
-        title: 'VERIFICATION APPROVED',
-        message: 'Your mentor account has been verified by an admin! You can now log in.'
+      const { error: notifError } = await supabase.from('notifications').insert({
+        recipient_id: mentorId,
+        actor_id: profile?.id || '00000000-0000-0000-0000-000000000000',
+        actor_name: 'SkillGenome Admin',
+        notification_type: 'system_alert',
+        message: 'VERIFICATION APPROVED: Your mentor account has been verified by an admin! You can now log in.'
       });
+      if (notifError) console.error("Notif Error:", notifError);
       Alert.alert("Mentor Approved", "The mentor has been verified and notified.");
     }
     
@@ -278,14 +282,14 @@ export default function AdminDashboardScreen({ profile, onBack, onOpenSettings, 
   };
 
   return (
-    <View style={[styles.root, { backgroundColor: C.bg }]}>
+    <View style={[styles.root, { backgroundColor: 'transparent' }]}>
       <View pointerEvents="none" style={StyleSheet.absoluteFill}>
         <LinearGradient colors={[`${C.accent}22`, `${C.accent}00`]} style={styles.glow1} />
         <LinearGradient colors={[`${C.cyan}18`, `${C.cyan}00`]} style={styles.glow2} />
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 150 }} showsVerticalScrollIndicator={false}>
-        <View style={[styles.container, { maxWidth: isWide ? 1120 : "100%" }]}>
+        <View style={[styles.container, { maxWidth: isWide ? 1600 : "100%" }]}>
           
           <View style={styles.header}>
             <View style={styles.brandWrap}>

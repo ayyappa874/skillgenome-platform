@@ -51,6 +51,36 @@ export default function MentorNotificationsScreen({ profile, onBack, isDarkMode 
     try {
       if (!profile?.id) return;
       
+      // Fetch system notifications (like admin approvals)
+      const { data: sysNotifs, error: sysErr } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('recipient_id', profile.id)
+        .order('created_at', { ascending: false });
+
+      const mappedSysNotifs = (sysNotifs || []).map(n => {
+        const isSystem = n.notification_type === 'system_alert';
+        let displayTitle = isSystem ? 'System Alert' : 'Notification';
+        let displayMessage = n.message || '';
+        
+        // Extract title from message if formatted like "TITLE: Message"
+        if (displayMessage.includes(': ')) {
+          const parts = displayMessage.split(': ');
+          displayTitle = parts[0];
+          displayMessage = parts.slice(1).join(': ');
+        }
+
+        return {
+          id: `sys_${n.id}`,
+          type: isSystem ? 'system' : (n.notification_type || 'system'),
+          title: displayTitle,
+          message: displayMessage,
+          created_at: n.created_at,
+          read: n.is_read || false,
+          data: n
+        };
+      });
+
       // Fetch pending mentorship requests
       const { data: requests, error: reqErr } = await supabase
         .from('mentorship_requests')
@@ -73,7 +103,9 @@ export default function MentorNotificationsScreen({ profile, onBack, isDarkMode 
         data: r
       }));
       
-      setNotifications(reqNotifs);
+      // Combine and sort by date
+      const allNotifs = [...mappedSysNotifs, ...reqNotifs].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      setNotifications(allNotifs);
     } catch (e) {
       console.error("Error fetching mentor notifications:", e);
     } finally {
