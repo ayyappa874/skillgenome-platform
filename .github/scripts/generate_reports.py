@@ -35,7 +35,7 @@ def run_generator(report_type):
         )
     elif report_type == "load":
         generate_csv(
-            "Load tests for backend skillgenome.csv",
+            "Consolidated skillgenome load test cases.csv",
             "Load Test",
             ["/api/login", "/api/user/profile", "/api/feed", "/api/search", "/api/chat", "/api/payments", "/api/notifications", "/api/settings", "/api/upload", "/api/download"],
             ["Latency < 200ms", "Zero Packet Loss", "Concurrency 1000 users", "Throughput > 500 req/s", "CPU < 70%", "Memory < 1GB", "Spike Testing 5k users", "Soak Testing 24hr duration"]
