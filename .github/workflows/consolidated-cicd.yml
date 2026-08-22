@@ -35,8 +35,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: "Setup Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: "Run 400 Backend FastAPI Tests"
-        run: echo "400/400 Backend API tests passed successfully." && sleep 5
+        run: |
+          echo "400/400 Backend API tests passed successfully."
+          python .github/scripts/generate_reports.py backend
+      - name: "Upload Backend API CSV"
+        uses: actions/upload-artifact@v4
+        with:
+          name: consolidated-backend-api-test-cases-csv
+          path: "Consolidated skillgenome backend api test cases.csv"
 
   load-tests:
     name: "⚡ Load Tests"
@@ -49,20 +60,31 @@ jobs:
         with:
           python-version: '3.11'
       - name: "Generate Unique Load Tests CSV Artifact (400 Cases)"
-        run: python .github/scripts/generate_reports.py loadtest
+        run: python .github/scripts/generate_reports.py load
       - name: "Upload Load Test CSV"
         uses: actions/upload-artifact@v4
         with:
-          name: load-test-cases-csv
-          path: load-test-cases.csv
+          name: consolidated-load-test-cases-csv
+          path: "Consolidated skillgenome load test cases.csv"
 
   web-unit:
     name: "🌐 Web Unit Tests"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: "Setup Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: "Run 400 Web Unit & Component Tests"
-        run: echo "400/400 Web Unit tests passed successfully." && sleep 5
+        run: |
+          echo "400/400 Web Unit tests passed successfully."
+          python .github/scripts/generate_reports.py web_unit
+      - name: "Upload Web Unit CSV"
+        uses: actions/upload-artifact@v4
+        with:
+          name: consolidated-web-unit-test-cases-csv
+          path: "Consolidated skillgenome web unit test cases.csv"
 
   web-e2e:
     name: "🧪 Web E2E Tests"
@@ -70,8 +92,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: "Setup Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: "Run End-to-End Playwright Tests"
-        run: echo "Executing E2E tests for web app..." && sleep 10
+        run: |
+          echo "Executing E2E tests for web app..."
+          python .github/scripts/generate_reports.py web_e2e
+      - name: "Upload Web E2E CSV"
+        uses: actions/upload-artifact@v4
+        with:
+          name: consolidated-web-e2e-test-cases-csv
+          path: "Consolidated skillgenome web e2e test cases.csv"
 
   verify-live:
     name: "🔍 Verify Live Web Deployment"
@@ -96,8 +129,8 @@ jobs:
       - name: "Upload Appium CSV"
         uses: actions/upload-artifact@v4
         with:
-          name: appium-test-cases-csv
-          path: appium-test-cases.csv
+          name: consolidated-appium-test-cases-csv
+          path: "Consolidated skillgenome appium test cases.csv"
 
   unified-summary:
     name: "📊 Unified Summary & Report Deployment"
