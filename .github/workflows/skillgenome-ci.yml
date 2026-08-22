@@ -245,19 +245,6 @@ jobs:
     needs: [security-scan, backend-tests, web-unit-tests, web-build, build-android, load-tests, verify-deployment, e2e-tests, android-appium]
     if: always()
     steps:
+      - uses: actions/checkout@v4
       - name: "📋 Generate GitHub Actions Summary"
-        run: |
-          echo "## 🚀 SkillGenome Universal Build Summary" >> $GITHUB_STEP_SUMMARY
-          echo "| Stage | Technology | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|------------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔒 Security Review | Semgrep | ✅ Complete |" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚙️ Backend API Tests | FastAPI/Pytest | ✅ Complete |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🧪 Web Unit Tests | Jest | ✅ Complete |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔨 Build Web App | Expo/React | ✅ Compiled |" >> $GITHUB_STEP_SUMMARY
-          echo "| 📱 Build Android APK | EAS/Gradle | ✅ Compiled |" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚡ Load Tests | Locust | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🌐 Verify Deployment | Curl | ✅ Verified |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🧪 Web E2E Tests | Playwright | ✅ Executed |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🤖 Android Appium E2E | Appium | ✅ Executed |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "> **Note:** SkillGenome successfully compiled across all matrix dimensions with 0 errors!" >> $GITHUB_STEP_SUMMARY
+        run: python3 .github/scripts/generate-summary.py
