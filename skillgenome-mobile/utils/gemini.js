@@ -63,17 +63,9 @@ export const generateGeminiResponse = async (history = [], newMessage = "", atta
 
     for (const apiKey of keysToTry) {
       try {
-        const isOAuth = apiKey.startsWith('AQ.') || apiKey.startsWith('ya29.');
-        const url = isOAuth ? GEMINI_API_URL : `${GEMINI_API_URL}?key=${apiKey}`;
-        const headers = { 'Content-Type': 'application/json' };
-        
-        if (isOAuth) {
-          headers['Authorization'] = `Bearer ${apiKey}`;
-        }
-
-        const response = await fetch(url, {
+        const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
           method: 'POST',
-          headers,
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents,
             generationConfig
@@ -127,17 +119,9 @@ export const transcribeAudio = async (base64Audio, mimeType, customKey = null) =
     let lastError = null;
     for (const apiKey of keysToTry) {
       try {
-        const isOAuth = apiKey.startsWith('AQ.') || apiKey.startsWith('ya29.');
-        const url = isOAuth ? GEMINI_API_URL : `${GEMINI_API_URL}?key=${apiKey}`;
-        const headers = { 'Content-Type': 'application/json' };
-        
-        if (isOAuth) {
-          headers['Authorization'] = `Bearer ${apiKey}`;
-        }
-
-        const response = await fetch(url, {
+        const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
           method: 'POST',
-          headers,
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ contents, generationConfig: { temperature: 0.2 } })
         });
 
