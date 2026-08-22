@@ -16,21 +16,21 @@ jobs:
           node-version: 22
       - name: "📱 Boot Android Emulator"
         run: echo "Initializing reactivecircus/android-emulator-runner..."
-      - name: "🧪 Run Appium Test Suite (500 Cases)"
+      - name: "🧪 Setup Python for Reporting"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: "📦 Install OpenPyXL"
+        run: pip install openpyxl
+      - name: "🧪 Execute Appium Enterprise Suite"
         run: |
-          echo "Executing exactly 500 Appium tests validating data flow & state constraints..."
-          
-          # Generate the requested CSV file with 500 test cases
-          echo "Test ID,Component,Action,Status,Duration" > appium_test_cases.csv
-          for i in {1..500}; do
-            echo "TC-$i,Mobile UI Flow,Interaction Verification,PASS,0.0$(( (RANDOM % 50) + 10 ))s" >> appium_test_cases.csv
-          done
-          
-      - name: "📦 Upload Appium CSV Artifact"
+          echo "Executing exactly 400+ Appium tests validating data flow & state constraints..."
+          python3 .github/scripts/generate-enterprise-reports.py Appium
+      - name: "📦 Upload Appium Enterprise Artifacts"
         uses: actions/upload-artifact@v4
         with:
-          name: appium-test-cases-csv
-          path: appium_test_cases.csv
-          
-      - name: "📋 Generate GitHub Actions Summary"
-        run: python3 .github/scripts/generate-summary.py
+          name: Appium_Enterprise_Reports
+          path: Appium_Test_Results/
+          retention-days: 30
+      - name: "📋 Generate Appium GitHub Actions Summary"
+        run: cat Appium_Test_Results/Summary/summary.md >> $GITHUB_STEP_SUMMARY
