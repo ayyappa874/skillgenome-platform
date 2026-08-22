@@ -2717,16 +2717,24 @@ const App = () => {
       const href = window.location.href;
       if (href.includes('access_token=') || href.includes('code=')) {
         console.log("Web OAuth redirect detected -> processing session...");
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        supabase.auth.getSession().then(async ({ data: { session } }) => {
           if (session?.user) {
             const user = session.user;
             const meta = user.user_metadata || {};
             const userName = meta.full_name || meta.name || user.email?.split('@')[0] || "Google User";
+            
+            const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+            const resolvedRole = profileData?.role || meta.user_type || 'student';
+
             setProfile((prev) => ({
               ...prev,
-              name: userName,
+              id: user.id,
+              name: profileData?.name || userName,
               email: user.email || prev.email,
-              avatarUrl: meta.avatar_url || meta.picture || prev.avatarUrl,
+              title: profileData?.title || prev.title,
+              role: resolvedRole,
+              skills: profileData?.skills || prev.skills || [],
+              avatarUrl: profileData?.avatar_url || meta.avatar_url || meta.picture || prev.avatarUrl,
             }));
             setCurrentScreen(10);
           }
@@ -2740,12 +2748,20 @@ const App = () => {
         const user = session.user;
         const meta = user.user_metadata || {};
         const userName = meta.full_name || meta.name || user.email?.split('@')[0] || "Google User";
+        
+        // Fetch full profile from DB to ensure role is preserved (fixes mentor landing redirect bug)
+        const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        const resolvedRole = profileData?.role || meta.user_type || 'student';
 
         setProfile((prev) => ({
           ...prev,
-          name: userName,
+          id: user.id,
+          name: profileData?.name || userName,
           email: user.email || prev.email,
-          avatarUrl: meta.avatar_url || meta.picture || prev.avatarUrl,
+          title: profileData?.title || prev.title,
+          role: resolvedRole,
+          skills: profileData?.skills || prev.skills || [],
+          avatarUrl: profileData?.avatar_url || meta.avatar_url || meta.picture || prev.avatarUrl,
         }));
 
         setCurrentScreen((prevScreen) => {
