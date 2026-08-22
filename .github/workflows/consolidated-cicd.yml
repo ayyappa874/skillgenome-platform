@@ -64,8 +64,8 @@ jobs:
       - name: "Upload Load Test CSV"
         uses: actions/upload-artifact@v4
         with:
-          name: consolidated-load-test-cases-csv
-          path: "Consolidated skillgenome load test cases.csv"
+          name: "Load tests for backend skillgenome"
+          path: "Load tests for backend skillgenome.csv"
 
   web-unit:
     name: "🌐 Web Unit Tests"
