@@ -1,4 +1,4 @@
-name: "📱 SkillGenome Unified CI/CD Pipeline"
+name: "📱 Consolidated SkillGenome CI/CD Pipeline & Unified Summary"
 
 on:
   push:
