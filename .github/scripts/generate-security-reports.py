@@ -96,35 +96,35 @@ def generate_security_reports():
 
     # 3. Generate Markdown Reports
     
-    with open(f"{base_dir}/backend-inventory.md", "w") as f:
+    with open(f"{base_dir}/backend-inventory.md", "w", encoding="utf-8") as f:
         f.write("# Backend Inventory\n\n- **Framework:** FastAPI / Python\n- **Database:** PostgreSQL\n- **Auth:** JWT\n- **Architecture:** Microservices\n")
         
-    with open(f"{base_dir}/executive-summary.md", "w") as f:
+    with open(f"{base_dir}/executive-summary.md", "w", encoding="utf-8") as f:
         critical_count = len([x for x in findings if x["Severity"] == "Critical"])
         f.write(f"# Executive Summary\n\nTotal Findings: {len(findings)}\nCritical: {critical_count}\nHigh: {len([x for x in findings if x['Severity'] == 'High'])}\nMedium: {len([x for x in findings if x['Severity'] == 'Medium'])}\nLow: {len([x for x in findings if x['Severity'] == 'Low'])}\n\n**Overall Security Score:** {max(0, 100 - (critical_count * 10))}/100\n")
         
-    with open(f"{base_dir}/security-review.md", "w") as f:
+    with open(f"{base_dir}/security-review.md", "w", encoding="utf-8") as f:
         f.write("# Security Review Details\n\n")
         for finding in findings:
             f.write(f"### {finding['Finding ID']} - {finding['Type']}\n**Severity:** {finding['Severity']}\n**Endpoint:** {finding['Endpoint']}\n\n")
 
-    with open(f"{base_dir}/dependency-report.md", "w") as f:
+    with open(f"{base_dir}/dependency-report.md", "w", encoding="utf-8") as f:
         f.write("# Dependency Report\n\nScanned via Semgrep & Trivy.\nNo critical CVEs found in base images.\n")
         
-    with open(f"{base_dir}/performance-report.md", "w") as f:
+    with open(f"{base_dir}/performance-report.md", "w", encoding="utf-8") as f:
         f.write("# Performance & Load Testing Results\n\n**Requests Per Second:** 120 req/sec\n**Average Response:** 250 ms\n**P99:** 800 ms\n")
 
-    with open(f"{base_dir}/remediation-guide.md", "w") as f:
+    with open(f"{base_dir}/remediation-guide.md", "w", encoding="utf-8") as f:
         f.write("# Remediation Guide\n\n1. Enforce strict JWT validation on all controllers.\n2. Parameterize all SQL queries.\n3. Implement generic error handling to avoid information disclosure.\n")
 
     # 4. Generate Mock Scripts
-    with open(f"{base_dir}/k6-load-test.js", "w") as f:
+    with open(f"{base_dir}/k6-load-test.js", "w", encoding="utf-8") as f:
         f.write("import http from 'k6/http';\nimport { sleep } from 'k6';\nexport default function () {\n  http.get('http://localhost:8000');\n  sleep(1);\n}\n")
     
-    with open(f"{base_dir}/artillery-load-test.yml", "w") as f:
+    with open(f"{base_dir}/artillery-load-test.yml", "w", encoding="utf-8") as f:
         f.write("config:\n  target: 'http://localhost:8000'\n  phases:\n    - duration: 60\n      arrivalRate: 50\nscenarios:\n  - flow:\n      - get:\n          url: '/api/health'\n")
         
-    with open(f"{base_dir}/jmeter-test-plan.jmx", "w") as f:
+    with open(f"{base_dir}/jmeter-test-plan.jmx", "w", encoding="utf-8") as f:
         f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<jmeterTestPlan>\n  <!-- Mock JMeter XML Structure -->\n</jmeterTestPlan>\n")
 
     print(f"Successfully generated full Backend Security Audit reports in '{base_dir}/'")

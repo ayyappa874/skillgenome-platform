@@ -116,7 +116,7 @@ def generate_reports(framework_type):
         },
         "results": test_cases
     }
-    with open(f"{base_dir}/JSON/execution-results.json", "w") as f:
+    with open(f"{base_dir}/JSON/execution-results.json", "w", encoding="utf-8") as f:
         json.dump(json_data, f, indent=4)
 
     # 3. HTML Report
@@ -155,7 +155,7 @@ def generate_reports(framework_type):
     </body>
     </html>
     """
-    with open(f"{base_dir}/HTML/execution-report.html", "w") as f:
+    with open(f"{base_dir}/HTML/execution-report.html", "w", encoding="utf-8") as f:
         f.write(html_content)
 
     # 4. Markdown Summary
@@ -179,7 +179,7 @@ def generate_reports(framework_type):
     if not failed:
         md_content += "\n*No tests failed! Excellent job! 🎉*\n"
 
-    with open(f"{base_dir}/Summary/summary.md", "w") as f:
+    with open(f"{base_dir}/Summary/summary.md", "w", encoding="utf-8") as f:
         f.write(md_content)
 
     print(f"Successfully generated {framework_type} enterprise reports in '{base_dir}/'")
